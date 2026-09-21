@@ -1,8 +1,6 @@
 from sqlalchemy import create_engine, text
 from config import Config
 
-print("URI generada:", Config.SQLALCHEMY_DATABASE_URI)
-
 try:
     engine = create_engine(Config.SQLALCHEMY_DATABASE_URI)
     with engine.connect() as conn:
