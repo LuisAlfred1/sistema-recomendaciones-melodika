@@ -13,6 +13,13 @@ def obtener_venta(id_venta):
     venta = Venta.query.get_or_404(id_venta)
     return jsonify(venta.to_dict())
 
+# Ruta para obtener los detalles de una venta específica
+@venta_bp.get("/<int:id_venta>/detalles")
+def obtener_detalles_de_venta(id_venta):
+    Venta.query.get_or_404(id_venta)  # 404 si la venta no existe
+    detalles = DetalleVenta.query.filter_by(id_venta=id_venta).all()
+    return jsonify([d.to_dict() for d in detalles])
+
 @venta_bp.post("")
 def crear_venta():
     """
