@@ -12,11 +12,16 @@ from routes.marca import marca_bp
 from routes.categoria import categoria_bp
 
 def create_app():
+    # Creamos una instancia de la aplicación Flask
     app = Flask(__name__)
+
+    # Configuramos la aplicación Flask con los parámetros definidos en la clase Config del archivo config.py
     app.config.from_object(Config)
 
+    # Inicializamos la extensión SQLAlchemy con la aplicación Flask
     db.init_app(app)
 
+    # Registramos los blueprints de las rutas, que permiten organizar las rutas de la aplicación en módulos separados.
     app.register_blueprint(producto_bp)
     app.register_blueprint(inventario_bp)
     app.register_blueprint(venta_bp)
@@ -27,6 +32,7 @@ def create_app():
     app.register_blueprint(marca_bp)
     app.register_blueprint(categoria_bp)
 
+    # Definimos una ruta raíz ("/") que devuelve un mensaje indicando que la API está activa.
     @app.get("/")
     def home():
         return {"mensaje": "API de Intrumentos Melodika activa"}
