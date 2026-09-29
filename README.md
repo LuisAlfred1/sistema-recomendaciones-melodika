@@ -15,7 +15,7 @@
 - APIs creadas
 - Datos iniciales creados: **10 productos - 10 inventarios (1 por producto)**, **2 clientes**, **1 empleado**
 
-### Alerta de stock negativo
+### Alerta de stock insuficiente
 
 Con Postman se intento crear una venta añadiendo más productos de lo disponible en stock, **respuesta**:
 
