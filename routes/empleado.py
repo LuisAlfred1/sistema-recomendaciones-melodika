@@ -23,3 +23,19 @@ def crear_empleado():
     db.session.add(nuevo)
     db.session.commit()
     return jsonify(nuevo.to_dict()), 201
+
+@empleado_bp.put("/<int:id_empleado>")
+def actualizar_empleado(id_empleado):
+    empleado = Empleado.query.get_or_404(id_empleado)
+    data = request.get_json()
+    empleado.nombre = data["nombre"]
+    empleado.rol = data["rol"]
+    db.session.commit()
+    return jsonify(empleado.to_dict())
+
+@empleado_bp.delete("/<int:id_empleado>")
+def eliminar_empleado(id_empleado):
+    empleado = Empleado.query.get_or_404(id_empleado)
+    db.session.delete(empleado)
+    db.session.commit()
+    return jsonify({"message": "Empleado eliminado correctamente"}), 200

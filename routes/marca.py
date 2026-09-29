@@ -22,3 +22,18 @@ def crear_marca():
     db.session.add(nuevo)
     db.session.commit()
     return jsonify(nuevo.to_dict()), 201
+
+@marca_bp.put("/<int:id_marca>")
+def actualizar_marca(id_marca):
+    marca = Marca.query.get_or_404(id_marca)
+    data = request.get_json()
+    marca.nombre = data["nombre"]
+    db.session.commit()
+    return jsonify(marca.to_dict())
+
+@marca_bp.delete("/<int:id_marca>")
+def eliminar_marca(id_marca):
+    marca = Marca.query.get_or_404(id_marca)
+    db.session.delete(marca)
+    db.session.commit()
+    return jsonify({"message": "Marca eliminada correctamente"}), 200

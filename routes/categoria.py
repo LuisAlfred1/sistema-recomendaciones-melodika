@@ -22,3 +22,18 @@ def crear_categoria():
     db.session.add(nuevo)
     db.session.commit()
     return jsonify(nuevo.to_dict()), 201
+
+@categoria_bp.put("/<int:id_categoria>")
+def actualizar_categoria(id_categoria):
+    categoria = Categoria.query.get_or_404(id_categoria)
+    data = request.get_json()
+    categoria.nombre = data["nombre"]
+    db.session.commit()
+    return jsonify(categoria.to_dict())
+
+@categoria_bp.delete("/<int:id_categoria>")
+def eliminar_categoria(id_categoria):
+    categoria = Categoria.query.get_or_404(id_categoria)
+    db.session.delete(categoria)
+    db.session.commit()
+    return jsonify({"message": "Categoría eliminada correctamente"}), 200

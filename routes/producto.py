@@ -27,3 +27,23 @@ def crear_producto():
     db.session.add(nuevo)
     db.session.commit()
     return jsonify(nuevo.to_dict()), 201
+
+@producto_bp.put("/<int:id_producto>")
+def actualizar_producto(id_producto):
+    producto = Producto.query.get_or_404(id_producto)
+    data = request.get_json()
+    producto.id_categoria = data.get("id_categoria", producto.id_categoria)
+    producto.id_proveedor = data.get("id_proveedor", producto.id_proveedor)
+    producto.nombre = data.get("nombre", producto.nombre)
+    producto.precio_unitario = data.get("precio_unitario", producto.precio_unitario)
+    producto.stock_minimo = data.get("stock_minimo", producto.stock_minimo)
+    producto.stock_maximo = data.get("stock_maximo", producto.stock_maximo)
+    db.session.commit()
+    return jsonify(producto.to_dict())
+
+@producto_bp.delete("/<int:id_producto>")
+def eliminar_producto(id_producto):
+    producto = Producto.query.get_or_404(id_producto)
+    db.session.delete(producto)
+    db.session.commit()
+    return jsonify({"message": "Producto eliminado correctamente"}), 200

@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import Blueprint, jsonify, request
 from models import db, Inventario
 
@@ -17,9 +18,21 @@ def obtener_inventario(id_inventario):
 def crear_inventario():
     data = request.get_json()
     nuevo = Inventario(
-        id_producto=data.get("id_producto"),
+        id_producto=data["id_producto"],
         stock_actual=data.get("stock_actual", 0),
     )
     db.session.add(nuevo)
     db.session.commit()
     return jsonify(nuevo.to_dict()), 201
+
+@inventario_bp.put("/<int:id_inventario>")
+def actualizar_inventario(id_inventario):
+    inventario = Inventario.query.get_or_404(id_inventario)
+    data = request.get_json()
+
+    if "stock_actual" in data:
+        inventario.stock_actual = data["stock_actual"]
+        inventario.fecha_actualizacion = datetime.utcnow()
+
+    db.session.commit()
+    return jsonify(inventario.to_dict())

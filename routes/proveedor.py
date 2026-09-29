@@ -24,3 +24,20 @@ def crear_proveedor():
     db.session.add(nuevo)
     db.session.commit()
     return jsonify(nuevo.to_dict()), 201
+
+@proveedor_bp.put("/<int:id_proveedor>")
+def actualizar_proveedor(id_proveedor):
+    proveedor = Proveedor.query.get_or_404(id_proveedor)
+    data = request.get_json()
+    proveedor.id_marca = data.get("id_marca", proveedor.id_marca)
+    proveedor.nombre = data.get("nombre", proveedor.nombre)
+    proveedor.telefono = data.get("telefono", proveedor.telefono)
+    db.session.commit()
+    return jsonify(proveedor.to_dict())
+
+@proveedor_bp.delete("/<int:id_proveedor>")
+def eliminar_proveedor(id_proveedor):
+    proveedor = Proveedor.query.get_or_404(id_proveedor)
+    db.session.delete(proveedor)
+    db.session.commit()
+    return jsonify({"message": "Proveedor eliminado correctamente"}), 200
