@@ -1,0 +1,7 @@
+Para inventario se crearon dos enpoints:
+
+1. actualizar_inventario: Este sirve para remplazar el stock actual con la cantidad que se establezca en el campo: stock_actual: (stock_actual:10, actualizar_inventario: 15 = stock_actual:15)
+
+2. registrar_entrega: Este sirve para añadir stock adicional al stock_actual, entonces hace una suma de la nueva entrada de productos junto con el stock_actual: (stock_actual:8, nueva_entrada:2 = stock_actual+nueva_entrada: 10)
+
+-------------------------------------------------------
