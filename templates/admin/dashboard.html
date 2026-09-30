@@ -1,0 +1,22 @@
+{% extends "base.html" %} {% block title %}Dashboard - Intrumentos Melodika{%
+endblock %} {% block content %}
+<div class="mb-6">
+  <p class="text-xs font-semibold uppercase tracking-widest text-brand-purple">
+    Inventario
+  </p>
+  <h1 class="mt-1 text-2xl font-bold text-brand-dark">
+    Dashboard de recomendaciones
+  </h1>
+</div>
+<div
+  id="contenedor-recomendaciones"
+  class="grid grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3"
+>
+  <p class="text-sm text-slate-500">Cargando recomendaciones...</p>
+</div>
+{% endblock %} {% block scripts %}
+<script
+  defer
+  src="{{ url_for('static', filename='js/dashboard.js') }}"
+></script>
+{% endblock %}

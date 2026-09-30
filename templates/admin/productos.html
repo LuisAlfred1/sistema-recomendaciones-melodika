@@ -1,0 +1,221 @@
+{% extends "base.html" %} {% block title %}Productos - Intrumentos Melodika{%
+endblock %} {% block content %}
+<div class="mb-6">
+  <p class="text-xs font-semibold uppercase tracking-widest text-brand-purple">
+    Catálogo
+  </p>
+  <div class="mt-1 flex flex-wrap items-center justify-between gap-4">
+    <h1 class="text-2xl font-bold text-brand-dark">Productos</h1>
+    <button
+      id="abrir-modal-crear"
+      type="button"
+      aria-haspopup="dialog"
+      aria-controls="modal-producto"
+      class="rounded-md bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-600 focus:ring-offset-2"
+    >
+      Crear producto
+    </button>
+  </div>
+</div>
+
+<dialog
+  id="modal-producto"
+  class="modal-panel"
+  aria-labelledby="titulo-modal-producto"
+>
+  <div
+    class="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5"
+  >
+    <div>
+      <p
+        class="text-xs font-semibold uppercase tracking-widest text-brand-purple"
+      >
+        Catálogo
+      </p>
+      <h2
+        id="titulo-modal-producto"
+        class="mt-1 text-lg font-bold text-brand-dark"
+      >
+        Crear producto
+      </h2>
+    </div>
+    <button
+      type="button"
+      data-cerrar-producto
+      class="rounded-md px-2 py-1 text-sm font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-800"
+      aria-label="Cerrar"
+    >
+      Cerrar
+    </button>
+  </div>
+  <form id="form-producto" class="p-6">
+    <input type="hidden" name="id_producto" />
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <label
+        class="grid gap-1.5 text-sm font-medium text-slate-700 sm:col-span-2"
+      >
+        Nombre
+        <input
+          name="nombre"
+          type="text"
+          required
+          class="min-w-0 rounded-md border border-slate-300 px-3 py-2 text-sm font-normal outline-none transition placeholder:text-slate-400 focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20"
+        />
+      </label>
+      <label class="grid gap-1.5 text-sm font-medium text-slate-700">
+        ID de categoría
+        <input
+          name="id_categoria"
+          type="number"
+          required
+          class="min-w-0 rounded-md border border-slate-300 px-3 py-2 text-sm font-normal outline-none transition focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20"
+        />
+      </label>
+      <label class="grid gap-1.5 text-sm font-medium text-slate-700">
+        ID de proveedor
+        <input
+          name="id_proveedor"
+          type="number"
+          required
+          class="min-w-0 rounded-md border border-slate-300 px-3 py-2 text-sm font-normal outline-none transition focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20"
+        />
+      </label>
+      <label class="grid gap-1.5 text-sm font-medium text-slate-700">
+        Precio unitario
+        <input
+          name="precio_unitario"
+          type="number"
+          min="0"
+          step="0.01"
+          required
+          class="min-w-0 rounded-md border border-slate-300 px-3 py-2 text-sm font-normal outline-none transition focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20"
+        />
+      </label>
+      <label class="grid gap-1.5 text-sm font-medium text-slate-700">
+        Stock mínimo
+        <input
+          name="stock_minimo"
+          type="number"
+          min="0"
+          required
+          class="min-w-0 rounded-md border border-slate-300 px-3 py-2 text-sm font-normal outline-none transition focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20"
+        />
+      </label>
+      <label
+        class="grid gap-1.5 text-sm font-medium text-slate-700 sm:col-span-2"
+      >
+        Stock máximo
+        <input
+          name="stock_maximo"
+          type="number"
+          min="0"
+          required
+          class="min-w-0 rounded-md border border-slate-300 px-3 py-2 text-sm font-normal outline-none transition focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20"
+        />
+      </label>
+    </div>
+    <p
+      id="error-modal-producto"
+      class="mt-4 hidden rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800"
+      role="alert"
+    ></p>
+    <div class="mt-6 flex justify-end gap-3 border-t border-slate-200 pt-4">
+      <button
+        type="button"
+        data-cerrar-producto
+        class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+      >
+        Cancelar
+      </button>
+      <button
+        id="boton-guardar-producto"
+        type="submit"
+        class="rounded-md bg-brand-purple px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-purple focus:ring-offset-2"
+      >
+        Crear producto
+      </button>
+    </div>
+  </form>
+</dialog>
+
+<dialog
+  id="modal-eliminar"
+  class="modal-panel"
+  aria-labelledby="titulo-modal-eliminar"
+>
+  <div class="p-6">
+    <p class="text-xs font-semibold uppercase tracking-widest text-red-700">
+      Confirmar eliminación
+    </p>
+    <h2
+      id="titulo-modal-eliminar"
+      class="mt-2 text-lg font-bold text-brand-dark"
+    >
+      ¿Eliminar este producto?
+    </h2>
+    <p class="mt-2 text-sm leading-6 text-slate-600">
+      Se eliminará
+      <strong id="nombre-producto-eliminar" class="text-slate-900"></strong>.
+      Esta acción no se puede deshacer.
+    </p>
+    <p
+      id="error-modal-eliminar"
+      class="mt-4 hidden rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800"
+      role="alert"
+    ></p>
+    <div class="mt-6 flex justify-end gap-3 border-t border-slate-200 pt-4">
+      <button
+        type="button"
+        data-cerrar-eliminar
+        class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-100"
+      >
+        Cancelar
+      </button>
+      <button
+        id="confirmar-eliminar"
+        type="button"
+        class="rounded-md bg-red-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-red-700 focus:ring-offset-2"
+      >
+        Eliminar producto
+      </button>
+    </div>
+  </div>
+</dialog>
+
+<div
+  id="mensaje-error"
+  class="mb-4 hidden rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+  role="alert"
+></div>
+
+<div
+  class="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm"
+>
+  <table class="w-full min-w-[600px] border-collapse text-left text-sm">
+    <thead
+      class="bg-brand-dark text-xs uppercase tracking-wider text-slate-200"
+    >
+      <tr>
+        <th class="px-5 py-3 font-semibold">ID</th>
+        <th class="px-5 py-3 font-semibold">Nombre</th>
+        <th class="px-5 py-3 font-semibold">Precio</th>
+        <th class="px-5 py-3 font-semibold">Mín</th>
+        <th class="px-5 py-3 font-semibold">Máx</th>
+        <th class="px-5 py-3 font-semibold">Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="tabla-productos" class="divide-y divide-slate-100">
+      <tr>
+        <td colspan="6" class="px-5 py-8 text-center text-slate-500">
+          Cargando...
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+{% endblock %} {% block scripts %}
+<script
+  defer
+  src="{{ url_for('static', filename='js/productos.js') }}"
+></script>
+{% endblock %}

@@ -11,6 +11,7 @@ from routes.proveedor import proveedor_bp
 from routes.marca import marca_bp
 from routes.categoria import categoria_bp
 from routes.recomendacion import recomendacion_bp
+from routes.admin_views import admin_views_bp
 
 def create_app():
     # Creamos una instancia de la aplicación Flask
@@ -33,6 +34,7 @@ def create_app():
     app.register_blueprint(marca_bp)
     app.register_blueprint(categoria_bp)
     app.register_blueprint(recomendacion_bp)
+    app.register_blueprint(admin_views_bp)
 
     # Definimos una ruta raíz ("/") que devuelve un mensaje indicando que la API está activa.
     @app.get("/")

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}Intrumentos Melodika{% endblock %}</title>
+    <script>
+      window.tailwind = {
+        config: {
+          theme: {
+            extend: {
+              colors: {
+                brand: {
+                  dark: "#12192C",
+                  purple: "#7135E8",
+                  gold: "#F8B633",
+                },
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="{{ url_for('static', filename='css/styles.css') }}"
+      rel="stylesheet"
+    />
+    <script defer src="{{ url_for('static', filename='js/api.js') }}"></script>
+    {% block extra_head %}{% endblock %}
+  </head>
+  <body class="min-h-screen bg-slate-100 text-slate-800 antialiased">
+    <div class="min-h-screen md:flex">
+      <aside class="admin-sidebar text-white md:flex md:w-64 md:flex-col">
+        <div class="flex items-center gap-3 border-b border-white/10 px-5 py-5">
+          <div>
+            <p class="font-semibold tracking-wide">Melodika</p>
+            <p class="text-xs text-slate-400">Panel de administración</p>
+          </div>
+        </div>
+        <nav
+          aria-label="Navegación principal"
+          class="flex gap-2 overflow-x-auto p-3 md:flex-1 md:flex-col md:gap-1 md:overflow-visible md:p-4"
+        >
+          <a
+            href="{{ url_for('admin_views.dashboard') }}"
+            aria-current="{% if request.endpoint == 'admin_views.dashboard' %}page{% endif %}"
+            class="admin-nav-link whitespace-nowrap rounded-md px-3 py-2.5 text-sm font-medium transition"
+            >Dashboard</a
+          >
+          <a
+            href="{{ url_for('admin_views.productos') }}"
+            aria-current="{% if request.endpoint == 'admin_views.productos' %}page{% endif %}"
+            class="admin-nav-link whitespace-nowrap rounded-md px-3 py-2.5 text-sm font-medium transition"
+            >Productos</a
+          >
+        </nav>
+        <div
+          class="hidden border-t border-white/10 px-5 py-4 text-xs text-slate-500 md:block"
+        >
+          Instrumentos Melodika
+        </div>
+      </aside>
+
+      <div class="min-w-0 flex-1">
+        <header
+          class="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-5 sm:px-8"
+        >
+          <div class="flex items-center gap-3">
+            <img
+              src="{{ url_for('static', filename='images/logoUno.png') }}"
+              alt="Logo de Melodika"
+              class="h-12 w-auto"
+            />
+            <p class="text-sm font-medium text-slate-600">
+              Panel de administración
+            </p>
+          </div>
+          <span
+            class="h-2.5 w-2.5 rounded-full bg-brand-gold"
+            aria-label="Panel activo"
+          ></span>
+        </header>
+        <main class="mx-auto w-full max-w-screen-2xl p-5 sm:p-8">
+          {% block content %}{% endblock %}
+        </main>
+      </div>
+    </div>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>

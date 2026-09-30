@@ -1,0 +1,73 @@
+:root {
+	--brand-dark: #12192c;
+	--brand-purple: #7135e8;
+	--brand-gold: #f8b633;
+}
+
+.bg-brand-dark {
+	background-color: var(--brand-dark);
+}
+
+.bg-brand-purple {
+	background-color: var(--brand-purple);
+}
+
+.bg-brand-gold {
+	background-color: var(--brand-gold);
+}
+
+.text-brand-dark {
+	color: var(--brand-dark);
+}
+
+.text-brand-purple {
+	color: var(--brand-purple);
+}
+
+.text-brand-gold {
+	color: var(--brand-gold);
+}
+
+.border-l-brand-gold {
+	border-left-color: var(--brand-gold);
+}
+
+.admin-sidebar {
+	background-color: var(--brand-dark);
+}
+
+.admin-brand-mark {
+	background-color: var(--brand-purple);
+}
+
+.admin-nav-link {
+	color: #cbd5e1;
+}
+
+.admin-nav-link:hover {
+	background-color: rgb(255 255 255 / 10%);
+	color: var(--brand-gold);
+}
+
+.admin-nav-link[aria-current="page"] {
+	border-left: 3px solid var(--brand-gold);
+	background-color: rgb(255 255 255 / 12%);
+	color: var(--brand-gold);
+}
+
+.modal-panel {
+	width: min(38rem, calc(100vw - 2rem));
+	max-height: calc(100vh - 2rem);
+	overflow-y: auto;
+	margin: auto;
+	border: 1px solid #e2e8f0;
+	border-radius: 0.5rem;
+	padding: 0;
+	color: #1e293b;
+	box-shadow: 0 24px 60px rgb(18 25 44 / 25%);
+}
+
+.modal-panel::backdrop {
+	background: rgb(18 25 44 / 60%);
+	backdrop-filter: blur(2px);
+}
