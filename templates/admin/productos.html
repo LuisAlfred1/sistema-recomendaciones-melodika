@@ -213,6 +213,42 @@ endblock %} {% block content %}
     </tbody>
   </table>
 </div>
+<div
+  class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+>
+  <p
+    id="resumen-paginacion"
+    class="text-sm text-slate-500"
+    aria-live="polite"
+  ></p>
+  <nav
+    id="paginacion-productos"
+    class="flex items-center justify-end gap-2"
+    aria-label="Paginación de productos"
+  >
+    <button
+      id="pagina-anterior"
+      type="button"
+      class="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+      aria-label="Página anterior"
+    >
+      Anterior
+    </button>
+    <span
+      id="pagina-actual"
+      class="min-w-20 text-center text-sm font-medium text-brand-dark"
+      aria-live="polite"
+    ></span>
+    <button
+      id="pagina-siguiente"
+      type="button"
+      class="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+      aria-label="Página siguiente"
+    >
+      Siguiente
+    </button>
+  </nav>
+</div>
 {% endblock %} {% block scripts %}
 <script
   defer

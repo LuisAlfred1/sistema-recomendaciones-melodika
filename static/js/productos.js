@@ -1,20 +1,31 @@
-async function cargarProductos() {
-  const tabla = document.getElementById("tabla-productos");
-  let productos;
+const PRODUCTOS_POR_PAGINA = 6;
+let productos = [];
+let paginaActual = 1;
 
-  try {
-    productos = await apiGet("/productos");
-  } catch (error) {
-    mostrarError(error.message);
-    return;
-  }
+function renderizarProductos() {
+  const tabla = document.getElementById("tabla-productos");
+  const totalPaginas = Math.max(
+    1,
+    Math.ceil(productos.length / PRODUCTOS_POR_PAGINA),
+  );
+  paginaActual = Math.min(paginaActual, totalPaginas);
+
+  const inicio = (paginaActual - 1) * PRODUCTOS_POR_PAGINA;
+  const productosPagina = productos.slice(
+    inicio,
+    inicio + PRODUCTOS_POR_PAGINA,
+  );
+  const navPaginacion = document.getElementById("paginacion-productos");
+  const resumen = document.getElementById("resumen-paginacion");
 
   if (productos.length === 0) {
     tabla.innerHTML = `<tr><td colspan="6" class="px-5 py-8 text-center text-slate-500">No hay productos todavía</td></tr>`;
+    resumen.textContent = "0 productos";
+    navPaginacion.classList.add("hidden");
     return;
   }
 
-  tabla.innerHTML = productos
+  tabla.innerHTML = productosPagina
     .map(
       (p) => `
         <tr class="transition hover:bg-slate-50">
@@ -31,6 +42,23 @@ async function cargarProductos() {
         `,
     )
     .join("");
+
+  resumen.textContent = `Mostrando ${inicio + 1}–${Math.min(inicio + PRODUCTOS_POR_PAGINA, productos.length)} de ${productos.length} productos`;
+  document.getElementById("pagina-actual").textContent =
+    `Página ${paginaActual} de ${totalPaginas}`;
+  document.getElementById("pagina-anterior").disabled = paginaActual === 1;
+  document.getElementById("pagina-siguiente").disabled =
+    paginaActual === totalPaginas;
+  navPaginacion.classList.toggle("hidden", totalPaginas <= 1);
+}
+
+async function cargarProductos() {
+  try {
+    productos = await apiGet("/productos");
+    renderizarProductos();
+  } catch (error) {
+    mostrarError(error.message);
+  }
 }
 
 function mostrarError(mensaje) {
@@ -157,6 +185,21 @@ document
     if (action === "delete") prepararEliminacion(id);
   });
 
+document.getElementById("pagina-anterior").addEventListener("click", () => {
+  if (paginaActual > 1) {
+    paginaActual -= 1;
+    renderizarProductos();
+  }
+});
+
+document.getElementById("pagina-siguiente").addEventListener("click", () => {
+  const totalPaginas = Math.ceil(productos.length / PRODUCTOS_POR_PAGINA);
+  if (paginaActual < totalPaginas) {
+    paginaActual += 1;
+    renderizarProductos();
+  }
+});
+
 document
   .getElementById("confirmar-eliminar")
   .addEventListener("click", eliminarProducto);
@@ -183,6 +226,7 @@ document
         await apiPut(`/productos/${id}`, datos);
       } else {
         await apiPost("/productos", datos);
+        paginaActual = 1;
       }
       modalProducto.close();
       await cargarProductos();
