@@ -1,0 +1,10 @@
+- GET /api/recomendaciones — lista solo los productos que necesitan atención (con al menos una alerta). Cada uno trae stock_actual, rotacion_30_dias, y un arreglo de alertas con tipo y mensaje.
+
+- GET /api/recomendaciones/<id_producto> — la misma evaluación pero para un solo producto (te sirve para la vista de detalle de un producto).
+
+Tres tipos de alerta:
+
+- reabastecer_ya → stock_actual < stock_minimo
+- cerca_del_minimo → stock_actual está dentro de un margen del 30% arriba del mínimo (advertencia temprana,  antes de que sea crítico)
+- ajustar_stock_maximo → se vendió más en los últimos 30 días de lo que el stock_maximo permite tener guardado; señal de que el producto rota más rápido de lo que el máximo contempla
+- si un producto no tiene registro en inventario, alerta con sin_inventario.
