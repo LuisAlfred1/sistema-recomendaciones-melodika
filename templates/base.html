@@ -42,10 +42,9 @@
           aria-label="Navegación principal"
           class="flex gap-2 overflow-x-auto p-3 md:flex-1 md:flex-col md:gap-1 md:overflow-visible md:p-4"
         >
-        <!--La idea es que en el inventario se muestre las recomendaciones -->
           <a
-            href="{{ url_for('admin_views.dashboard') }}"
-            aria-current="{% if request.endpoint == 'admin_views.dashboard' %}page{% endif %}"
+            href="{{ url_for('admin_views.inventario') }}"
+            aria-current="{% if request.endpoint == 'admin_views.inventario' %}page{% endif %}"
             class="admin-nav-link whitespace-nowrap rounded-md px-3 py-2.5 text-sm font-medium transition"
             >Inventario</a
           >

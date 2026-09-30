@@ -1,45 +1,281 @@
-const COLOR_POR_TIPO = {
-  reabastecer_ya: "bg-red-100 text-red-800",
-  cerca_del_minimo: "bg-amber-100 text-amber-800",
-  ajustar_stock_maximo: "bg-sky-100 text-sky-800",
-  sin_inventario: "bg-slate-200 text-slate-700",
+const CONFIGURACION_ALERTAS = {
+  reabastecer_ya: {
+    nombre: "Reabastecer ya",
+    clase: "bg-red-100 text-red-800",
+    prioridad: 0,
+  },
+  sin_inventario: {
+    nombre: "Sin registro",
+    clase: "bg-slate-200 text-slate-700",
+    prioridad: 1,
+  },
+  cerca_del_minimo: {
+    nombre: "Cerca del mínimo",
+    clase: "bg-amber-100 text-amber-800",
+    prioridad: 2,
+  },
+  ajustar_stock_maximo: {
+    nombre: "Revisar máximo",
+    clase: "bg-sky-100 text-sky-800",
+    prioridad: 3,
+  },
 };
 
-function crearTarjeta(item) {
-  const badges = item.alertas
-    .map(
-      (a) =>
-        `<span class="mr-1 inline-flex rounded px-2 py-1 text-xs font-semibold ${COLOR_POR_TIPO[a.tipo] || "bg-slate-200 text-slate-700"}">${a.tipo}</span>`,
-    )
-    .join("");
+let productosInventario = [];
 
-  const mensajes = item.alertas.map((a) => `<li>${a.mensaje}</li>`).join("");
-
-  return `
-        <article class="rounded-lg border border-slate-200 border-l-4 border-l-brand-gold bg-white p-5 shadow-sm">
-            <h2 class="text-base font-semibold text-brand-dark">${item.nombre}</h2>
-            <p class="mt-3">${badges}</p>
-            <p class="mt-3 text-sm text-slate-600">Stock actual: <strong class="text-brand-dark">${item.stock_actual ?? "N/D"}</strong></p>
-            <p class="mt-1 text-sm text-slate-600">Rotación (30 días): <strong class="text-brand-dark">${item.rotacion_30_dias}</strong></p>
-            <ul class="mt-3 space-y-1 text-sm text-slate-500">${mensajes}</ul>
-        </article>
-    `;
+function escaparHTML(valor) {
+  return String(valor ?? "").replace(/[&<>"']/g, (caracter) => {
+    const entidades = {
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    };
+    return entidades[caracter];
+  });
 }
 
-async function cargarRecomendaciones() {
-  const contenedor = document.getElementById("contenedor-recomendaciones");
+function contarAlerta(tipo) {
+  return productosInventario.filter((producto) =>
+    producto.alertas.some((alerta) => alerta.tipo === tipo),
+  ).length;
+}
+
+function actualizarResumen() {
+  document.getElementById("conteo-reabastecer").textContent =
+    contarAlerta("reabastecer_ya");
+  document.getElementById("conteo-minimo").textContent =
+    contarAlerta("cerca_del_minimo");
+  document.getElementById("conteo-sin-inventario").textContent =
+    contarAlerta("sin_inventario");
+  document.getElementById("conteo-maximo").textContent = contarAlerta(
+    "ajustar_stock_maximo",
+  );
+}
+
+function obtenerEstadoPrincipal(alertas) {
+  const alerta = [...alertas].sort(
+    (a, b) =>
+      (CONFIGURACION_ALERTAS[a.tipo]?.prioridad ?? 99) -
+      (CONFIGURACION_ALERTAS[b.tipo]?.prioridad ?? 99),
+  )[0];
+
+  return alerta
+    ? { ...CONFIGURACION_ALERTAS[alerta.tipo], tipo: alerta.tipo }
+    : { nombre: "En rango", clase: "bg-emerald-100 text-emerald-800" };
+}
+
+function filtrarProductos() {
+  const filtro = document.getElementById("filtro-inventario").value;
+  if (filtro === "todos") return productosInventario;
+  if (filtro === "atencion") {
+    return productosInventario.filter(
+      (producto) => producto.alertas.length > 0,
+    );
+  }
+
+  return productosInventario.filter((producto) =>
+    producto.alertas.some((alerta) => alerta.tipo === filtro),
+  );
+}
+
+function renderizarInventario() {
+  const tabla = document.getElementById("tabla-inventario");
+  const resumen = document.getElementById("resumen-inventario");
+  const filtro = document.getElementById("filtro-inventario");
+  const visibles = filtrarProductos();
+
+  if (visibles.length === 0) {
+    tabla.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-slate-500">No hay productos para este filtro.</td></tr>`;
+    resumen.textContent = "0 productos";
+    return;
+  }
+
+  tabla.innerHTML = visibles
+    .map((producto) => {
+      const estado = obtenerEstadoPrincipal(producto.alertas);
+      const alertasSecundarias = producto.alertas.filter(
+        (alerta) => alerta.tipo !== estado.tipo,
+      );
+      const etiquetas = alertasSecundarias.length
+        ? alertasSecundarias
+            .map((alerta) => {
+              const config = CONFIGURACION_ALERTAS[alerta.tipo];
+              if (!config) return "";
+              return `<span class="mb-1 mr-1 inline-flex rounded px-2 py-1 text-xs font-semibold ${config.clase}">${config.nombre}</span>`;
+            })
+            .join("")
+        : "";
+      const recomendaciones = producto.alertas.length
+        ? `<ul class="space-y-1 text-sm text-slate-600">${producto.alertas
+            .map((alerta) => `<li>${escaparHTML(alerta.mensaje)}</li>`)
+            .join("")}</ul>`
+        : `<span class="text-sm text-slate-500">Sin acciones pendientes.</span>`;
+      const stock = producto.inventario
+        ? `<strong class="text-brand-dark">${producto.stock_actual}</strong><span class="ml-1 text-xs text-slate-500">de ${producto.stock_maximo} máx.</span><p class="mt-1 text-xs text-slate-500">Mínimo: ${producto.stock_minimo}</p>`
+        : `<span class="text-sm font-medium text-slate-500">Sin registro</span><p class="mt-1 text-xs text-slate-500">Mínimo: ${producto.stock_minimo} · Máximo: ${producto.stock_maximo}</p>`;
+      const accion = producto.inventario
+        ? "Registrar entrada"
+        : "Registrar stock";
+
+      return `
+        <tr class="align-top transition hover:bg-slate-50">
+          <td class="px-4 py-4 font-medium text-brand-dark">${escaparHTML(producto.nombre)}<span class="mt-1 block text-xs font-normal text-slate-500">ID ${producto.id_producto}</span></td>
+          <td class="px-4 py-4">${stock}</td>
+          <td class="px-4 py-4 text-slate-700">${producto.rotacion_30_dias} unidades</td>
+          <td class="px-4 py-4"><span class="inline-flex rounded px-2 py-1 text-xs font-semibold ${estado.clase}">${estado.nombre}</span><div class="mt-2">${etiquetas}</div></td>
+          <td class="max-w-sm px-4 py-4">${recomendaciones}</td>
+          <td class="px-4 py-4"><button type="button" data-action="stock" data-id="${producto.id_producto}" class="whitespace-nowrap rounded-md bg-brand-purple px-3 py-2 text-xs font-semibold text-white transition hover:bg-brand-dark">${accion}</button></td>
+        </tr>
+      `;
+    })
+    .join("");
+
+  resumen.textContent = `Mostrando ${visibles.length} de ${productosInventario.length} productos`;
+  filtro.disabled = false;
+}
+
+async function cargarInventario() {
+  const error = document.getElementById("mensaje-error-inventario");
+  error.classList.add("hidden");
+
   try {
-    const recomendaciones = await apiGet("/recomendaciones");
+    const [productos, inventarios, recomendaciones] = await Promise.all([
+      apiGet("/productos"),
+      apiGet("/inventarios"),
+      apiGet("/recomendaciones"),
+    ]);
+    const inventarioPorProducto = new Map(
+      inventarios.map((inventario) => [inventario.id_producto, inventario]),
+    );
+    const recomendacionesPorProducto = new Map(
+      recomendaciones.map((recomendacion) => [
+        recomendacion.id_producto,
+        recomendacion,
+      ]),
+    );
 
-    if (recomendaciones.length === 0) {
-      contenedor.innerHTML = `<p class="rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800 lg:col-span-2 2xl:col-span-3">Sin alertas por el momento. Todo el inventario está en buen estado.</p>`;
-      return;
-    }
+    productosInventario = productos
+      .map((producto) => {
+        const inventario = inventarioPorProducto.get(producto.id_producto);
+        const recomendacion = recomendacionesPorProducto.get(
+          producto.id_producto,
+        );
+        return {
+          ...producto,
+          inventario,
+          stock_actual: inventario?.stock_actual ?? null,
+          rotacion_30_dias: recomendacion?.rotacion_30_dias ?? 0,
+          alertas: recomendacion?.alertas ?? [],
+        };
+      })
+      .sort((a, b) => {
+        const estadoA = obtenerEstadoPrincipal(a.alertas);
+        const estadoB = obtenerEstadoPrincipal(b.alertas);
+        return (estadoA.prioridad ?? 99) - (estadoB.prioridad ?? 99);
+      });
 
-    contenedor.innerHTML = recomendaciones.map(crearTarjeta).join("");
-  } catch (error) {
-    contenedor.innerHTML = `<p class="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-800 lg:col-span-2 2xl:col-span-3">No se pudieron cargar las recomendaciones: ${error.message}</p>`;
+    actualizarResumen();
+    renderizarInventario();
+  } catch (errorCarga) {
+    error.textContent = `No se pudo cargar el inventario: ${errorCarga.message}`;
+    error.classList.remove("hidden");
+    document.getElementById("tabla-inventario").innerHTML =
+      `<tr><td colspan="6" class="px-4 py-8 text-center text-slate-500">No se pudo cargar el inventario.</td></tr>`;
   }
 }
 
-document.addEventListener("DOMContentLoaded", cargarRecomendaciones);
+const modalStock = document.getElementById("modal-stock");
+const formularioStock = document.getElementById("form-stock");
+
+function abrirModalStock(idProducto) {
+  const producto = productosInventario.find(
+    (item) => String(item.id_producto) === String(idProducto),
+  );
+  if (!producto) return;
+
+  const esEntrada = Boolean(producto.inventario);
+  const cantidad = formularioStock.elements.namedItem("cantidad");
+  formularioStock.reset();
+  formularioStock.elements.namedItem("id_producto").value =
+    producto.id_producto;
+  formularioStock.elements.namedItem("id_inventario").value =
+    producto.inventario?.id_inventario ?? "";
+  document.getElementById("titulo-modal-stock").textContent = esEntrada
+    ? "Registrar entrada"
+    : "Registrar stock inicial";
+  document.getElementById("nombre-modal-stock").textContent = producto.nombre;
+  document.getElementById("etiqueta-cantidad-stock").textContent = esEntrada
+    ? "Unidades recibidas"
+    : "Stock actual inicial";
+
+  const disponible = Math.max(
+    0,
+    producto.stock_maximo - (producto.stock_actual ?? 0),
+  );
+  cantidad.max = disponible;
+  document.getElementById("ayuda-stock").textContent = esEntrada
+    ? `Stock actual: ${producto.stock_actual}. Puedes recibir hasta ${disponible} unidades para no superar el máximo de ${producto.stock_maximo}.`
+    : `El máximo permitido para este producto es ${producto.stock_maximo} unidades.`;
+  document.getElementById("error-modal-stock").classList.add("hidden");
+  modalStock.showModal();
+  cantidad.focus();
+}
+
+document
+  .getElementById("filtro-inventario")
+  .addEventListener("change", renderizarInventario);
+
+document
+  .getElementById("tabla-inventario")
+  .addEventListener("click", (evento) => {
+    const boton = evento.target.closest('button[data-action="stock"]');
+    if (boton) abrirModalStock(boton.dataset.id);
+  });
+
+document.querySelectorAll("[data-cerrar-stock]").forEach((boton) => {
+  boton.addEventListener("click", () => modalStock.close());
+});
+
+formularioStock.addEventListener("submit", async (evento) => {
+  evento.preventDefault();
+  const idProducto = formularioStock.elements.namedItem("id_producto").value;
+  const idInventario =
+    formularioStock.elements.namedItem("id_inventario").value;
+  const cantidad = Number(formularioStock.elements.namedItem("cantidad").value);
+  const producto = productosInventario.find(
+    (item) => String(item.id_producto) === String(idProducto),
+  );
+  const stockNuevo = (producto?.stock_actual ?? 0) + cantidad;
+
+  if (!producto || cantidad <= 0 || stockNuevo > producto.stock_maximo) {
+    const error = document.getElementById("error-modal-stock");
+    error.textContent = `La cantidad debe ser mayor que cero y el stock total no puede superar ${producto?.stock_maximo ?? 0}.`;
+    error.classList.remove("hidden");
+    return;
+  }
+
+  const boton = formularioStock.querySelector('button[type="submit"]');
+  boton.disabled = true;
+  try {
+    if (idInventario) {
+      await apiPost(`/inventarios/${idInventario}/entrada`, { cantidad });
+    } else {
+      await apiPost("/inventarios", {
+        id_producto: Number(idProducto),
+        stock_actual: cantidad,
+      });
+    }
+    modalStock.close();
+    await cargarInventario();
+  } catch (error) {
+    const mensaje = document.getElementById("error-modal-stock");
+    mensaje.textContent = error.message;
+    mensaje.classList.remove("hidden");
+  } finally {
+    boton.disabled = false;
+  }
+});
+
+document.addEventListener("DOMContentLoaded", cargarInventario);
