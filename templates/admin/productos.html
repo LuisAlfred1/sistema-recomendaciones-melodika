@@ -63,22 +63,24 @@ endblock %} {% block content %}
         />
       </label>
       <label class="grid gap-1.5 text-sm font-medium text-slate-700">
-        ID de categoría
-        <input
+        Categoría
+        <select
           name="id_categoria"
-          type="number"
           required
-          class="min-w-0 rounded-md border border-slate-300 px-3 py-2 text-sm font-normal outline-none transition focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20"
-        />
+          class="min-w-0 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-normal outline-none transition focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20"
+        >
+          <option value="">Selecciona una categoría</option>
+        </select>
       </label>
       <label class="grid gap-1.5 text-sm font-medium text-slate-700">
-        ID de proveedor
-        <input
+        Proveedor
+        <select
           name="id_proveedor"
-          type="number"
           required
-          class="min-w-0 rounded-md border border-slate-300 px-3 py-2 text-sm font-normal outline-none transition focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20"
-        />
+          class="min-w-0 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm font-normal outline-none transition focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20"
+        >
+          <option value="">Selecciona un proveedor</option>
+        </select>
       </label>
       <label class="grid gap-1.5 text-sm font-medium text-slate-700">
         Precio unitario

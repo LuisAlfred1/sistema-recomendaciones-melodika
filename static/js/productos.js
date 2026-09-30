@@ -74,6 +74,45 @@ function ocultarError() {
 const modalProducto = document.getElementById("modal-producto");
 const modalEliminar = document.getElementById("modal-eliminar");
 const formularioProducto = document.getElementById("form-producto");
+let promesaCatalogos;
+
+function llenarSelect(idSelect, elementos, idKey, textoInicial) {
+  const select = formularioProducto.elements.namedItem(idSelect);
+  select.replaceChildren(new Option(textoInicial, ""));
+
+  elementos.forEach((elemento) => {
+    select.add(new Option(elemento.nombre, elemento[idKey]));
+  });
+}
+
+function cargarCatalogos() {
+  if (!promesaCatalogos) {
+    promesaCatalogos = Promise.all([
+      apiGet("/categorias"),
+      apiGet("/proveedores"),
+    ])
+      .then(([categorias, proveedores]) => {
+        llenarSelect(
+          "id_categoria",
+          categorias,
+          "id_categoria",
+          "Selecciona una categoría",
+        );
+        llenarSelect(
+          "id_proveedor",
+          proveedores,
+          "id_proveedor",
+          "Selecciona un proveedor",
+        );
+      })
+      .catch((error) => {
+        promesaCatalogos = undefined;
+        throw error;
+      });
+  }
+
+  return promesaCatalogos;
+}
 
 function ocultarErrorModal(id) {
   document.getElementById(id).classList.add("hidden");
@@ -85,7 +124,14 @@ function mostrarErrorModal(id, mensaje) {
   error.classList.remove("hidden");
 }
 
-function abrirModalCrear() {
+async function abrirModalCrear() {
+  try {
+    await cargarCatalogos();
+  } catch (error) {
+    mostrarError(error.message);
+    return;
+  }
+
   formularioProducto.reset();
   formularioProducto.elements.namedItem("id_producto").value = "";
   document.getElementById("titulo-modal-producto").textContent =
@@ -102,7 +148,10 @@ async function editarProducto(id) {
   ocultarError();
 
   try {
-    const producto = await apiGet(`/productos/${id}`);
+    const [producto] = await Promise.all([
+      apiGet(`/productos/${id}`),
+      cargarCatalogos(),
+    ]);
     formularioProducto.elements.namedItem("id_producto").value =
       producto.id_producto;
     formularioProducto.elements.namedItem("nombre").value = producto.nombre;
@@ -236,3 +285,6 @@ document
   });
 
 document.addEventListener("DOMContentLoaded", cargarProductos);
+document.addEventListener("DOMContentLoaded", () => {
+  cargarCatalogos().catch((error) => mostrarError(error.message));
+});
