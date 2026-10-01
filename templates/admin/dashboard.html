@@ -32,9 +32,7 @@ endblock %} {% block content %}
   aria-label="Resumen de alertas"
   class="mb-6 grid grid-cols-2 gap-3 xl:grid-cols-4"
 >
-  <article
-    class="rounded-md border-2 border-red-200 bg-white px-4 py-3"
-  >
+  <article class="rounded-md border-2 border-red-200 bg-white px-4 py-3">
     <p class="text-xs font-semibold uppercase text-red-800">Reabastecer ya</p>
     <p
       id="conteo-reabastecer"
@@ -44,9 +42,7 @@ endblock %} {% block content %}
       -
     </p>
   </article>
-  <article
-    class="rounded-md border-2 border-amber-200 bg-white px-4 py-3"
-  >
+  <article class="rounded-md border-2 border-amber-200 bg-white px-4 py-3">
     <p class="text-xs font-semibold uppercase text-amber-800">
       Cerca del mínimo
     </p>
@@ -58,9 +54,7 @@ endblock %} {% block content %}
       -
     </p>
   </article>
-  <article
-    class="rounded-md border-2 border-slate-200 bg-white px-4 py-3"
-  >
+  <article class="rounded-md border-2 border-slate-200 bg-white px-4 py-3">
     <p class="text-xs font-semibold uppercase text-slate-600">Sin registro</p>
     <p
       id="conteo-sin-inventario"
@@ -70,9 +64,7 @@ endblock %} {% block content %}
       -
     </p>
   </article>
-  <article
-    class="rounded-md border-2 border-sky-200 bg-white px-4 py-3"
-  >
+  <article class="rounded-md border-2 border-sky-200 bg-white px-4 py-3">
     <p class="text-xs font-semibold uppercase text-sky-800">
       Revisar stock máximo
     </p>
@@ -117,11 +109,42 @@ endblock %} {% block content %}
     </tbody>
   </table>
 </div>
-<p
-  id="resumen-inventario"
-  class="mt-3 text-sm text-slate-500"
-  aria-live="polite"
-></p>
+<div
+  class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"
+>
+  <p
+    id="resumen-inventario"
+    class="text-sm text-slate-500"
+    aria-live="polite"
+  ></p>
+  <nav
+    id="paginacion-inventario"
+    class="hidden flex items-center justify-end gap-2"
+    aria-label="Paginación del inventario"
+  >
+    <button
+      id="inventario-pagina-anterior"
+      type="button"
+      class="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+      aria-label="Página anterior del inventario"
+    >
+      Anterior
+    </button>
+    <span
+      id="pagina-inventario-actual"
+      class="min-w-20 text-center text-sm font-medium text-brand-dark"
+      aria-live="polite"
+    ></span>
+    <button
+      id="inventario-pagina-siguiente"
+      type="button"
+      class="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+      aria-label="Página siguiente del inventario"
+    >
+      Siguiente
+    </button>
+  </nav>
+</div>
 
 <dialog
   id="modal-stock"

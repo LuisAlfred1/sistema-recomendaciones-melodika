@@ -21,7 +21,9 @@ const CONFIGURACION_ALERTAS = {
   },
 };
 
+const PRODUCTOS_INVENTARIO_POR_PAGINA = 6;
 let productosInventario = [];
+let paginaInventarioActual = 1;
 
 function escaparHTML(valor) {
   return String(valor ?? "").replace(/[&<>"']/g, (caracter) => {
@@ -85,14 +87,26 @@ function renderizarInventario() {
   const resumen = document.getElementById("resumen-inventario");
   const filtro = document.getElementById("filtro-inventario");
   const visibles = filtrarProductos();
+  const totalPaginas = Math.max(
+    1,
+    Math.ceil(visibles.length / PRODUCTOS_INVENTARIO_POR_PAGINA),
+  );
+  paginaInventarioActual = Math.min(paginaInventarioActual, totalPaginas);
+  const inicio = (paginaInventarioActual - 1) * PRODUCTOS_INVENTARIO_POR_PAGINA;
+  const productosPagina = visibles.slice(
+    inicio,
+    inicio + PRODUCTOS_INVENTARIO_POR_PAGINA,
+  );
+  const paginacion = document.getElementById("paginacion-inventario");
 
   if (visibles.length === 0) {
     tabla.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-slate-500">No hay productos para este filtro.</td></tr>`;
     resumen.textContent = "0 productos";
+    paginacion.classList.add("hidden");
     return;
   }
 
-  tabla.innerHTML = visibles
+  tabla.innerHTML = productosPagina
     .map((producto) => {
       const estado = obtenerEstadoPrincipal(producto.alertas);
       const alertasSecundarias = producto.alertas.filter(
@@ -112,7 +126,9 @@ function renderizarInventario() {
             .map((alerta) => `<li>${escaparHTML(alerta.mensaje)}</li>`)
             .join("")}</ul>`
         : `<span class="text-sm text-slate-500">Sin acciones pendientes.</span>`;
-      const stock = producto.inventario ? `<strong class="text-brand-dark">${producto.stock_actual}</strong>` : `<span class="text-sm font-medium text-slate-500">Sin registro</span>`;
+      const stock = producto.inventario
+        ? `<strong class="text-brand-dark">${producto.stock_actual}</strong>`
+        : `<span class="text-sm font-medium text-slate-500">Sin registro</span>`;
       const accion = producto.inventario
         ? "Registrar entrada"
         : "Registrar stock";
@@ -130,7 +146,14 @@ function renderizarInventario() {
     })
     .join("");
 
-  resumen.textContent = `Mostrando ${visibles.length} de ${productosInventario.length} productos`;
+  resumen.textContent = `Mostrando ${inicio + 1}–${Math.min(inicio + PRODUCTOS_INVENTARIO_POR_PAGINA, visibles.length)} de ${visibles.length} productos`;
+  document.getElementById("pagina-inventario-actual").textContent =
+    `Página ${paginaInventarioActual} de ${totalPaginas}`;
+  document.getElementById("inventario-pagina-anterior").disabled =
+    paginaInventarioActual === 1;
+  document.getElementById("inventario-pagina-siguiente").disabled =
+    paginaInventarioActual === totalPaginas;
+  paginacion.classList.toggle("hidden", totalPaginas <= 1);
   filtro.disabled = false;
 }
 
@@ -221,9 +244,31 @@ function abrirModalStock(idProducto) {
   cantidad.focus();
 }
 
+document.getElementById("filtro-inventario").addEventListener("change", () => {
+  paginaInventarioActual = 1;
+  renderizarInventario();
+});
+
 document
-  .getElementById("filtro-inventario")
-  .addEventListener("change", renderizarInventario);
+  .getElementById("inventario-pagina-anterior")
+  .addEventListener("click", () => {
+    if (paginaInventarioActual > 1) {
+      paginaInventarioActual -= 1;
+      renderizarInventario();
+    }
+  });
+
+document
+  .getElementById("inventario-pagina-siguiente")
+  .addEventListener("click", () => {
+    const totalPaginas = Math.ceil(
+      filtrarProductos().length / PRODUCTOS_INVENTARIO_POR_PAGINA,
+    );
+    if (paginaInventarioActual < totalPaginas) {
+      paginaInventarioActual += 1;
+      renderizarInventario();
+    }
+  });
 
 document
   .getElementById("tabla-inventario")
