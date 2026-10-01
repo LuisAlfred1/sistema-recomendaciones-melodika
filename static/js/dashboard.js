@@ -112,16 +112,14 @@ function renderizarInventario() {
             .map((alerta) => `<li>${escaparHTML(alerta.mensaje)}</li>`)
             .join("")}</ul>`
         : `<span class="text-sm text-slate-500">Sin acciones pendientes.</span>`;
-      const stock = producto.inventario
-        ? `<strong class="text-brand-dark">${producto.stock_actual}</strong><span class="ml-1 text-xs text-slate-500">de ${producto.stock_maximo} máx.</span><p class="mt-1 text-xs text-slate-500">Mínimo: ${producto.stock_minimo}</p>`
-        : `<span class="text-sm font-medium text-slate-500">Sin registro</span><p class="mt-1 text-xs text-slate-500">Mínimo: ${producto.stock_minimo} · Máximo: ${producto.stock_maximo}</p>`;
+      const stock = producto.inventario ? `<strong class="text-brand-dark">${producto.stock_actual}</strong>` : `<span class="text-sm font-medium text-slate-500">Sin registro</span>`;
       const accion = producto.inventario
         ? "Registrar entrada"
         : "Registrar stock";
 
       return `
         <tr class="align-top transition hover:bg-slate-50">
-          <td class="px-4 py-4 font-medium text-brand-dark">${escaparHTML(producto.nombre)}<span class="mt-1 block text-xs font-normal text-slate-500">ID ${producto.id_producto}</span></td>
+          <td class="px-4 py-4 font-medium text-brand-dark">${escaparHTML(producto.nombre)}</td>
           <td class="px-4 py-4">${stock}</td>
           <td class="px-4 py-4 text-slate-700">${producto.rotacion_30_dias} unidades</td>
           <td class="px-4 py-4"><span class="inline-flex rounded px-2 py-1 text-xs font-semibold ${estado.clase}">${estado.nombre}</span><div class="mt-2">${etiquetas}</div></td>
